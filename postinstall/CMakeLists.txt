@@ -9,4 +9,4 @@ ELSE(MSVC AND NOT USING_NMAKE)
 ENDIF(MSVC AND NOT USING_NMAKE)
 
 CONFIGURE_FILE("PostInstall.cmake.in" "PostInstall.cmake" @ONLY)
-INSTALL(SCRIPT "${CMAKE_BINARY_DIR}/postinstall/PostInstall.cmake")
+#INSTALL(SCRIPT "${CMAKE_BINARY_DIR}/postinstall/PostInstall.cmake")

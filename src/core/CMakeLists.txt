@@ -549,7 +549,7 @@ SET(QGIS_CORE_SRCS
 
 FILE(GLOB JSON_HELP_FILES "${CMAKE_SOURCE_DIR}/resources/function_help/json/*")
 IF(NOT USING_NINJA)
-  STRING(REPLACE "$" "$$" JSON_HELP_FILES "${JSON_HELP_FILES}")
+  STRING(REPLACE "$" "\$" JSON_HELP_FILES "${JSON_HELP_FILES}")
 ENDIF(NOT USING_NINJA)
 STRING(REPLACE "\(" "\\(" JSON_HELP_FILES "${JSON_HELP_FILES}")
 STRING(REPLACE "\)" "\\)" JSON_HELP_FILES "${JSON_HELP_FILES}")
@@ -580,11 +580,11 @@ IF (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   SET_SOURCE_FILES_PROPERTIES(qgsspatialindex.cpp PROPERTIES COMPILE_FLAGS -Wno-overloaded-virtual)
 ENDIF (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 
-IF (QT_MOBILITY_LOCATION_FOUND OR Qt5Positioning_FOUND)
+IF (QT_MOBILITY_LOCATION_FOUND OR TARGET Qt5::Positioning)
   SET(QGIS_CORE_SRCS ${QGIS_CORE_SRCS}
     gps/qgsqtlocationconnection.cpp
   )
-ENDIF (QT_MOBILITY_LOCATION_FOUND OR Qt5Positioning_FOUND)
+ENDIF ()
 
 ADD_FLEX_FILES(QGIS_CORE_SRCS qgsexpressionlexer.ll qgssqlstatementlexer.ll)
 ADD_BISON_FILES(QGIS_CORE_SRCS qgsexpressionparser.yy qgssqlstatementparser.yy)
@@ -799,11 +799,11 @@ ENDIF(NOT WITH_QTWEBKIT)
 #    qgshttptransaction.h
 #)
 
-IF (QT_MOBILITY_LOCATION_FOUND OR Qt5Positioning_FOUND)
+IF (QT_MOBILITY_LOCATION_FOUND OR TARGET Qt5::Positioning)
   SET(QGIS_CORE_MOC_HDRS ${QGIS_CORE_MOC_HDRS}
     gps/qgsqtlocationconnection.h
   )
-ENDIF (QT_MOBILITY_LOCATION_FOUND OR Qt5Positioning_FOUND)
+ENDIF ()
 
 
 IF (HAVE_OPENCL)
@@ -1215,16 +1215,17 @@ SET(QGIS_CORE_HDRS
   validity/qgsvaliditycheckregistry.h
 )
 
-IF (QT_MOBILITY_LOCATION_FOUND OR Qt5Positioning_FOUND)
+IF (QT_MOBILITY_LOCATION_FOUND OR TARGET Qt5::Positioning)
   SET(QGIS_CORE_HDRS ${QGIS_CORE_HDRS}
     gps/qgsqtlocationconnection.h
     gps/qgsgpsconnectionregistry.h
   )
-ENDIF (QT_MOBILITY_LOCATION_FOUND OR Qt5Positioning_FOUND)
+ENDIF ()
 
 INCLUDE_DIRECTORIES(
   ${CMAKE_CURRENT_SOURCE_DIR}
   ${CMAKE_CURRENT_BINARY_DIR}
+  ${CMAKE_CURRENT_BINARY_DIR}/vectortile
   3d
   annotations
   auth
@@ -1257,21 +1258,6 @@ INCLUDE_DIRECTORIES(
   ${CMAKE_SOURCE_DIR}/external/poly2tri
 )
 
-INCLUDE_DIRECTORIES(SYSTEM
-  ${PROJ_INCLUDE_DIR}
-  ${GDAL_INCLUDE_DIR}
-  ${LIBZIP_INCLUDE_DIRS}
-  ${SPATIALINDEX_INCLUDE_DIR}
-  ${GEOS_INCLUDE_DIR}
-  ${EXPAT_INCLUDE_DIR}
-  ${SQLITE3_INCLUDE_DIR}
-  ${SPATIALITE_INCLUDE_DIR}
-  ${QCA_INCLUDE_DIR}
-  ${QTKEYCHAIN_INCLUDE_DIR}
-  ${Qt5SerialPort_INCLUDE_DIRS}
-)
-
-
 IF (HAVE_OPENCL)
     SET(QGIS_CORE_SRCS ${QGIS_CORE_SRCS}
         qgsopenclutils.cpp
@@ -1279,7 +1265,6 @@ IF (HAVE_OPENCL)
     SET(QGIS_CORE_HDRS ${QGIS_CORE_HDRS}
         qgsopenclutils.h
     )
-    INCLUDE_DIRECTORIES(SYSTEM ${OpenCL_INCLUDE_DIRS})
 ENDIF (HAVE_OPENCL)
 
 
@@ -1314,12 +1299,12 @@ GENERATE_EXPORT_HEADER(
 SET(QGIS_CORE_HDRS ${QGIS_CORE_HDRS} ${CMAKE_CURRENT_BINARY_DIR}/qgis_core.h)
 
 IF(ENABLE_MODELTEST)
-  TARGET_LINK_LIBRARIES(qgis_core ${Qt5Test_LIBRARIES})
+  TARGET_LINK_LIBRARIES(qgis_core Qt5::Test)
 ENDIF(ENABLE_MODELTEST)
 
 
 IF(HAVE_OPENCL)
-  TARGET_LINK_LIBRARIES(qgis_core ${OpenCL_LIBRARY})
+  TARGET_LINK_LIBRARIES(qgis_core OpenCL::OpenCL)
 ENDIF(HAVE_OPENCL)
 
 
@@ -1378,39 +1363,39 @@ IF (QT_MOBILITY_LOCATION_FOUND)
 ENDIF (QT_MOBILITY_LOCATION_FOUND)
 
 TARGET_LINK_LIBRARIES(qgis_core
-  ${Qt5Xml_LIBRARIES}
-  ${Qt5Core_LIBRARIES}
-  ${Qt5Gui_LIBRARIES}
-  ${Qt5Widgets_LIBRARIES}
-  ${Qt5Svg_LIBRARIES}
-  ${Qt5PrintSupport_LIBRARIES}
-  ${Qt5Network_LIBRARIES}
-  ${OPTIONAL_QTWEBKIT}
-  ${Qt5Sql_LIBRARIES}
-  ${Qt5Concurrent_LIBRARIES}
-  ${QCA_LIBRARY}
-  ${QTKEYCHAIN_LIBRARY}
-  ${PROJ_LIBRARY}
-  ${GEOS_LIBRARY}
-  ${GDAL_LIBRARY}
-  ${SPATIALINDEX_LIBRARY}
-  ${EXPAT_LIBRARY}
-  ${SQLITE3_LIBRARY}
-  ${SPATIALITE_LIBRARY}
-  ${LIBZIP_LIBRARY}
+  libzip::zip
+  Qt5::Xml
+  Qt5::Core
+  Qt5::Gui
+  Qt5::Widgets
+  Qt5::Svg
+  Qt5::PrintSupport
+  Qt5::Network
+  Qt5::Sql
+  Qt5::Concurrent
+  Qca::Qca
+  QtKeychain::QtKeychain
+  PROJ::proj
+  GEOS::geos
+  GDAL::GDAL
+  libspatialindex::libspatialindex
+  libspatialite::libspatialite
+  expat::expat
+  SQLite::SQLite3
+  ZLIB::ZLIB
 )
 
-IF (Qt5SerialPort_FOUND)
+IF (TARGET Qt5::SerialPort)
   TARGET_LINK_LIBRARIES(qgis_core
     Qt5::SerialPort
   )
-ENDIF (Qt5SerialPort_FOUND)
+ENDIF ()
 
-IF (Qt5Positioning_FOUND)
+IF (TARGET Qt5::Positioning)
   TARGET_LINK_LIBRARIES(qgis_core
     Qt5::Positioning
   )
-ENDIF (Qt5Positioning_FOUND)
+ENDIF ()
 
 TARGET_COMPILE_DEFINITIONS(qgis_core PRIVATE "-DQT_NO_FOREACH")
 

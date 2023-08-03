@@ -23,15 +23,6 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}
   ${CMAKE_BINARY_DIR}/src/core
   ${CMAKE_SOURCE_DIR}/external
 )
-INCLUDE_DIRECTORIES(SYSTEM
-  ${QT_INCLUDE_DIR}
-  ${GDAL_INCLUDE_DIR}
-  ${GEOS_INCLUDE_DIR}
-  ${MDAL_INCLUDE_DIR}
-  ${QCA_INCLUDE_DIR}
-  ${QTKEYCHAIN_INCLUDE_DIR}
-  ${POSTGRES_INCLUDE_DIR}
-)
 
 #note for tests we should not include the moc of our
 #qtests in the executable file list as the moc is
@@ -48,13 +39,13 @@ MACRO (ADD_QGIS_TEST testname testsrc)
   ADD_EXECUTABLE(qgis_${testname} ${qgis_${testname}_SRCS})
   SET_TARGET_PROPERTIES(qgis_${testname} PROPERTIES AUTOMOC TRUE)
   TARGET_LINK_LIBRARIES(qgis_${testname}
-    ${Qt5Xml_LIBRARIES}
-    ${Qt5Core_LIBRARIES}
-    ${Qt5Svg_LIBRARIES}
-    ${Qt5Test_LIBRARIES}
-    ${PROJ_LIBRARY}
-    ${GEOS_LIBRARY}
-    ${GDAL_LIBRARY}
+    Qt5::Core
+    Qt5::Xml
+    Qt5::Svg
+    Qt5::Test
+    PROJ::proj
+    GEOS::geos
+    GDAL::GDAL
     qgis_core)
   ADD_TEST(qgis_${testname} ${CMAKE_CURRENT_BINARY_DIR}/../../../output/bin/qgis_${testname} -maxwarnings 10000)
 ENDMACRO (ADD_QGIS_TEST)

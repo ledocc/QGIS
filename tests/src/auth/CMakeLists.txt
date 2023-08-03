@@ -21,19 +21,6 @@ INCLUDE_DIRECTORIES(
   ${CMAKE_BINARY_DIR}/src/auth/oauth2
 )
 
-INCLUDE_DIRECTORIES(SYSTEM
-  ${QT_INCLUDE_DIR}
-  ${GDAL_INCLUDE_DIR}
-  ${PROJ_INCLUDE_DIR}
-  ${GEOS_INCLUDE_DIR}
-  ${QCA_INCLUDE_DIR}
-  ${SQLITE3_INCLUDE_DIR}
-  ${QTKEYCHAIN_INCLUDE_DIR}
-  ${O2_INCLUDE_DIR}
-)
-
-# libraries
-
 # because of htonl
 IF (WIN32)
   SET(PLATFORM_LIBRARIES wsock32)
@@ -46,18 +33,6 @@ MACRO (ADD_QGIS_TEST testname testsrc)
     TARGET_LINK_LIBRARIES(qgis_${testname} ${APP_SERVICES_LIBRARY})
   ENDIF(APPLE)
   TARGET_LINK_LIBRARIES(qgis_${testname}
-    ${Qt5Core_LIBRARIES}
-    ${Qt5Xml_LIBRARIES}
-    ${Qt5Svg_LIBRARIES}
-    ${Qt5Test_LIBRARIES}
-    ${Qt5Network_LIBRARIES}
-    ${PROJ_LIBRARY}
-    ${GEOS_LIBRARY}
-    ${GDAL_LIBRARY}
-    ${OPTIONAL_QTWEBKIT}
-    ${PROJ_LIBRARY}
-    ${GEOS_LIBRARY}
-    ${GDAL_LIBRARY}
     qgis_core
     qgis_gui
     )

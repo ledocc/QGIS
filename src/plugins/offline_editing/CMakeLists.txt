@@ -40,7 +40,7 @@ ADD_LIBRARY (offlineeditingplugin MODULE
 TARGET_LINK_LIBRARIES(offlineeditingplugin
   qgis_core
   qgis_gui
-  ${SPATIALITE_LIBRARY}
+  spatialite::spacialite
 )
 
 INCLUDE_DIRECTORIES(SYSTEM

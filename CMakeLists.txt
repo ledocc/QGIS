@@ -40,25 +40,9 @@ ELSE (${CMAKE_HOST_SYSTEM_NAME} MATCHES "BSD$")
   OPTION(USE_OPENCL "Use OpenCL" ON)
 ENDIF (${CMAKE_HOST_SYSTEM_NAME} MATCHES "BSD$")
 IF (USE_OPENCL)
-    FIND_PACKAGE(OpenCL)
-    IF(${OpenCL_FOUND})
-        SET(HAVE_OPENCL TRUE)
-        # Fixup for standard FindOpenCL module not assinging proper framework headers directory
-        IF (APPLE AND "${OpenCL_INCLUDE_DIR}" MATCHES "OpenCL\\.framework/?$")
-            SET(OpenCL_INCLUDE_DIR "${OpenCL_INCLUDE_DIR}/Headers" CACHE PATH "" FORCE)
-            SET(OpenCL_INCLUDE_DIRS ${OpenCL_INCLUDE_DIR})
-        ENDIF ()
-        FIND_PACKAGE(OpenCLhpp)
-        IF(NOT OPENCL_HPP_FOUND)
-            # Use internal headers copied from OpenCL-CLHPP project
-            SET(OPENCL_HPP_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external/opencl-clhpp/include CACHE PATH "" FORCE)
-            MESSAGE(STATUS "Couldn't find OpenCL C++ headers, using internal: ${OPENCL_HPP_INCLUDE_DIR}")
-        ENDIF(NOT OPENCL_HPP_FOUND)
-        SET(OpenCL_INCLUDE_DIRS ${OpenCL_INCLUDE_DIRS} ${OPENCL_HPP_INCLUDE_DIR})
-    ELSE(${OpenCL_FOUND})
-        MESSAGE(STATUS "Couldn't find OpenCL: support DISABLED")
-    ENDIF(${OpenCL_FOUND})
-ENDIF(USE_OPENCL)
+    FIND_PACKAGE(OpenCL REQUIRED)
+    FIND_PACKAGE(OpenCLHeadersCpp REQUIRED)
+ENDIF()
 
 # Configure CCache if available
 IF(NOT MSVC)
@@ -298,24 +282,27 @@ IF(WITH_CORE)
 
   # required
   FIND_PACKAGE(Proj)
+  ADD_DEFINITIONS(-DPROJ_VERSION_MAJOR=${Proj_VERSION_MAJOR})
+
   FIND_PACKAGE(GEOS)
   FIND_PACKAGE(GDAL)
   FIND_PACKAGE(Expat REQUIRED)
-  FIND_PACKAGE(Spatialindex REQUIRED)
+  FIND_PACKAGE(libspatialindex REQUIRED)
+  FIND_PACKAGE(libspatialite REQUIRED)
   IF (WITH_GUI)
     FIND_PACKAGE(Qwt REQUIRED)
   ENDIF (WITH_GUI)
   FIND_PACKAGE(LibZip REQUIRED)
 
-  FIND_PACKAGE(Sqlite3)
-  IF (NOT SQLITE3_FOUND)
-    MESSAGE (SEND_ERROR "sqlite3 dependency was not found!")
-  ENDIF (NOT SQLITE3_FOUND)
+  FIND_PACKAGE(SQLite3 REQUIRED)
+#  IF (NOT SQLITE3_FOUND)
+#    MESSAGE (SEND_ERROR "sqlite3 dependency was not found!")
+#  ENDIF (NOT SQLITE3_FOUND)
 
   # optional
-  IF (WITH_POSTGRESQL)
+  IF(WITH_POSTGRESQL)
     FIND_PACKAGE(Postgres) # PostgreSQL provider
-  ENDIF (WITH_POSTGRESQL)
+  ENDIF()
 
   IF (NOT WITH_INTERNAL_MDAL)
     FIND_PACKAGE(MDAL REQUIRED) # MDAL provider
@@ -323,9 +310,9 @@ IF(WITH_CORE)
 
   FIND_PACKAGE(SpatiaLite REQUIRED)
 
-  IF (NOT PROJ_FOUND OR NOT GEOS_FOUND OR NOT GDAL_FOUND)
-    MESSAGE (SEND_ERROR "Some dependencies were not found! Proj: ${PROJ_FOUND}, Geos: ${GEOS_FOUND}, GDAL: ${GDAL_FOUND}")
-  ENDIF (NOT PROJ_FOUND OR NOT GEOS_FOUND OR NOT GDAL_FOUND)
+  IF (NOT Proj_FOUND OR NOT GEOS_FOUND OR NOT GDAL_FOUND)
+    MESSAGE (SEND_ERROR "Some dependencies were not found! Proj: ${Proj_FOUND}, Geos: ${GEOS_FOUND}, GDAL: ${GDAL_FOUND}")
+  ENDIF ()
 
   IF (POSTGRES_FOUND)
     # following variable is used in qgsconfig.h
@@ -346,33 +333,45 @@ IF(WITH_CORE)
   # Use Qt5SerialPort optionally for GPS
   SET (WITH_QT5SERIALPORT TRUE CACHE BOOL "Determines whether Qt5SerialPort should be tried for GPS positioning")
   IF (WITH_QT5SERIALPORT)
-      FIND_PACKAGE(Qt5SerialPort REQUIRED)
+      FIND_PACKAGE(Qt5 REQUIRED COMPONENTS SerialPort)
       # following variable is used in qgsconfig.h
       SET (HAVE_QT5SERIALPORT TRUE)
   ENDIF(WITH_QT5SERIALPORT)
 
-  FIND_PACKAGE(Qt5Core QUIET)
-  FIND_PACKAGE(Qt5Gui REQUIRED)
-  FIND_PACKAGE(Qt5Widgets REQUIRED)
-  FIND_PACKAGE(Qt5Network REQUIRED)
-  FIND_PACKAGE(Qt5Xml REQUIRED)
-  FIND_PACKAGE(Qt5Svg REQUIRED)
-  FIND_PACKAGE(Qt5Concurrent REQUIRED)
-  FIND_PACKAGE(Qt5PrintSupport REQUIRED)
-  FIND_PACKAGE(Qt5Positioning)
+  FIND_PACKAGE(Qt5 REQUIRED
+      COMPONENTS
+          Core
+          Gui
+          Widgets
+          Network
+          Xml
+          Svg
+          Concurrent
+          PrintSupport
+          Positioning
+  )
   IF (WITH_QTWEBKIT)
-    FIND_PACKAGE(Qt5WebKit REQUIRED)
-    FIND_PACKAGE(Qt5WebKitWidgets REQUIRED)
+      FIND_PACKAGE(Qt5 REQUIRED
+          COMPONENT
+              WebKit
+              WebKitWidgets
+          )
   ENDIF(WITH_QTWEBKIT)
-  FIND_PACKAGE(Qt5Test REQUIRED)
-  FIND_PACKAGE(Qt5UiTools REQUIRED)
-  FIND_PACKAGE(Qt5Sql REQUIRED)
+  FIND_PACKAGE(Qt5 REQUIRED
+      COMPONENTS
+          Test
+          UiTools
+          Sql
+  )
   IF (WITH_3D)
-    FIND_PACKAGE(Qt53DCore REQUIRED)
-    FIND_PACKAGE(Qt53DRender REQUIRED)
-    FIND_PACKAGE(Qt53DInput REQUIRED)
-    FIND_PACKAGE(Qt53DLogic REQUIRED)
-    FIND_PACKAGE(Qt53DExtras REQUIRED)
+      FIND_PACKAGE(Qt5 REQUIRED
+          COMPONENTS
+              3DCore
+              3DRender
+              3DInput
+              3DLogic
+              3DExtras
+      )
     SET(HAVE_3D TRUE)  # used in qgsconfig.h
   ENDIF (WITH_3D)
   IF (APPLE)
@@ -381,12 +380,15 @@ IF(WITH_CORE)
   INCLUDE("cmake/modules/ECMQt4To5Porting.cmake")
   MESSAGE(STATUS "Found Qt version: ${Qt5Core_VERSION_STRING}")
   IF (WITH_QUICK)
-    FIND_PACKAGE(Qt5Qml REQUIRED)
-    FIND_PACKAGE(Qt5Quick REQUIRED)
+      FIND_PACKAGE(Qt5 REQUIRED
+          COMPONENTS
+              Qml
+              Quick
+      )
     IF(${CMAKE_SYSTEM_NAME} MATCHES "Android")
-        FIND_PACKAGE(Qt5AndroidExtras)
+        FIND_PACKAGE(Qt5 COMPONENTS AndroidExtras)
     ELSE(${CMAKE_SYSTEM_NAME} MATCHES "Android")
-        FIND_PACKAGE(QtQmlTools)
+        FIND_PACKAGE(Qt5  COMPONENTS QmlTools)
     ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Android")
 
     # following variable is used in qgsconfig.h
@@ -409,7 +411,7 @@ IF(WITH_CORE)
   # Password helper
   FIND_PACKAGE(QtKeychain REQUIRED)
   # Master password hash and authentication encryption
-  FIND_PACKAGE(QCA REQUIRED)
+  FIND_PACKAGE(Qca REQUIRED)
   # Check for runtime dependency of qca-ossl plugin
   # REQUIRED if unit tests are to be run from build directory
   IF(NOT MSVC)

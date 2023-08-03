@@ -15,18 +15,6 @@ INCLUDE_DIRECTORIES(
   ${CMAKE_BINARY_DIR}/src/gui
 )
 
-INCLUDE_DIRECTORIES(SYSTEM
-  ${GEOS_INCLUDE_DIR}
-  ${QCA_INCLUDE_DIR}
-  ${QTKEYCHAIN_INCLUDE_DIR}
-)
-
-IF (WITH_GUI)
-  INCLUDE_DIRECTORIES(SYSTEM
-    ${QSCINTILLA_INCLUDE_DIR}
-  )
-ENDIF ()
-
 ###############################################################################
 
 SET (AFS_SRCS
@@ -62,12 +50,12 @@ ADD_LIBRARY(arcgisfeatureserverprovider MODULE ${AFS_SRCS} ${AFS_MOC_SRCS})
 
 TARGET_LINK_LIBRARIES(arcgisfeatureserverprovider
   qgis_core
-  ${QCA_LIBRARY}
+  Qca::Qca
 )
 
 TARGET_LINK_LIBRARIES (arcgisfeatureserverprovider_a
   qgis_core
-  ${QCA_LIBRARY}
+  Qca::Qca
 )
 
 IF (WITH_GUI)
@@ -114,7 +102,7 @@ ADD_LIBRARY(arcgismapserverprovider MODULE ${AMS_SRCS} ${AMS_MOC_SRCS})
 
 TARGET_LINK_LIBRARIES(arcgismapserverprovider
   qgis_core
-  ${QCA_LIBRARY}
+  Qca::Qca
 )
 
 IF (WITH_GUI)

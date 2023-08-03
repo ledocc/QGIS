@@ -30,6 +30,7 @@
 
 #include <QSize>
 #include <QPainter>
+#include <QPainterPath>
 #include <QPointF>
 #include <QPolygonF>
 

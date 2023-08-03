@@ -29,6 +29,7 @@
 
 #include <QPen>
 #include <QBrush>
+#include <QPainterPath>
 #include <QPicture>
 #include <QPolygonF>
 #include <QFont>

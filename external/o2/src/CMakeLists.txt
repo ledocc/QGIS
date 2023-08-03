@@ -161,8 +161,7 @@ if(o2_WITH_KEYCHAIN)
     endif()
     if(QTKEYCHAIN_FOUND OR QT5KEYCHAIN_FOUND)
         MESSAGE("Found QTKeychain")
-        list(APPEND LINK_TARGETS ${QTKEYCHAIN_LIBRARY})
-        include_directories(${QTKEYCHAIN_INCLUDE_DIR})
+        list(APPEND LINK_TARGETS qtkeychain::qtkeychain)
         set( o2_SRCS
                 ${o2_SRCS}
                 o0keychainstore.cpp

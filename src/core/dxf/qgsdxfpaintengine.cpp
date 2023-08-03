@@ -20,6 +20,8 @@
 #include "qgsdxfpaintdevice.h"
 #include "qgslogger.h"
 
+#include <QPainterPath>
+
 QgsDxfPaintEngine::QgsDxfPaintEngine( const QgsDxfPaintDevice *dxfDevice, QgsDxfExport *dxf )
   : QPaintEngine( QPaintEngine::AllFeatures /*QPaintEngine::PainterPaths | QPaintEngine::PaintOutsidePaintEvent*/ )
   , mPaintDevice( dxfDevice )

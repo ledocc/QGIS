@@ -28,6 +28,7 @@
 #include <cmath>
 #include <memory>
 #include <QPainter>
+#include <QPainterPath>
 #include <limits>
 #include <QDomDocument>
 #include <QJsonObject>

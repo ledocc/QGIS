@@ -1,13 +1,6 @@
 INCLUDE_DIRECTORIES(
   ${CMAKE_SOURCE_DIR}/src/providers/grass
 )
-INCLUDE_DIRECTORIES(SYSTEM
-  ${GDAL_INCLUDE_DIR}
-  ${GEOS_INCLUDE_DIR}
-  ${POSTGRES_INCLUDE_DIR}
-  ${PROJ_INCLUDE_DIR}
-)
-
 
 MACRO (ADD_QGIS_GRASS_TEST grass_build_version testname testsrc)
   SET(qgis_${testname}${grass_build_version}_SRCS ${testsrc} ${util_SRCS})
@@ -23,13 +16,6 @@ MACRO (ADD_QGIS_GRASS_TEST grass_build_version testname testsrc)
     COMPILE_FLAGS "-DGRASS_BASE=\\\"${GRASS_PREFIX${grass_build_version}}\\\" \"-DGRASS_BUILD_VERSION=${grass_build_version}\""
   )
   TARGET_LINK_LIBRARIES(qgis_${testname}${grass_build_version}
-    ${Qt5Xml_LIBRARIES}
-    ${Qt5Core_LIBRARIES}
-    ${Qt5Svg_LIBRARIES}
-    ${Qt5Test_LIBRARIES}
-    ${PROJ_LIBRARY}
-    ${GEOS_LIBRARY}
-    ${GDAL_LIBRARY}
     qgis_core
     qgisgrass${grass_build_version}
   )

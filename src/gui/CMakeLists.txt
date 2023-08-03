@@ -767,16 +767,16 @@ SET(QGIS_GUI_MOC_HDRS
   processing/qgsprocessingwidgetwrapper.h
   processing/qgsprocessingwidgetwrapperimpl.h
 )
-FIND_PACKAGE(Qt5Qml REQUIRED)
-FIND_PACKAGE(Qt5QuickWidgets REQUIRED)
+FIND_PACKAGE(Qt5 COMPONENTS Qml REQUIRED)
+FIND_PACKAGE(Qt5 COMPONENTS QuickWidgets REQUIRED)
 
-IF(Qt5Qml_FOUND)
-ADD_DEFINITIONS(-DWITH_QML)
-SET(QGIS_GUI_MOC_HDRS
-  ${QGIS_GUI_MOC_HDRS}
-  editorwidgets/qgsqmlwidgetwrapper.h
-)
-ENDIF(Qt5Qml_FOUND)
+IF(TARGET Qt5::Qml)
+    ADD_DEFINITIONS(-DWITH_QML)
+    SET(QGIS_GUI_MOC_HDRS
+        ${QGIS_GUI_MOC_HDRS}
+        editorwidgets/qgsqmlwidgetwrapper.h
+    )
+ENDIF()
 
 SET_PROPERTY(GLOBAL PROPERTY QGIS_GUI_MOC_HDRS ${QGIS_GUI_MOC_HDRS})
 
@@ -886,13 +886,13 @@ SET(QGIS_GUI_HDRS
   symbology/qgssymbolwidgetcontext.h
 )
 
-IF(Qt5Qml_FOUND)
+IF(TARGET Qt5::Qml)
 
-SET(QGIS_GUI_SRCS
-  ${QGIS_GUI_SRCS}
-  editorwidgets/qgsqmlwidgetwrapper.cpp
-)
-ENDIF(Qt5Qml_FOUND)
+    SET(QGIS_GUI_SRCS
+        ${QGIS_GUI_SRCS}
+        editorwidgets/qgsqmlwidgetwrapper.cpp
+    )
+ENDIF()
 
 SET_PROPERTY(GLOBAL PROPERTY QGIS_GUI_HDRS ${QGIS_GUI_HDRS})
 
@@ -939,9 +939,6 @@ IF(ENABLE_MODELTEST)
   INCLUDE_DIRECTORIES(../../tests/qt_modeltest)
 ENDIF(ENABLE_MODELTEST)
 
-INCLUDE_DIRECTORIES(SYSTEM
-  ${QT_QTUITOOLS_INCLUDE_DIR}
-)
 INCLUDE_DIRECTORIES(
   ${CMAKE_SOURCE_DIR}/src/gui
   ${CMAKE_SOURCE_DIR}/src/gui/symbology
@@ -981,15 +978,6 @@ INCLUDE_DIRECTORIES(
   ${CMAKE_BINARY_DIR}/src/gui
   ${CMAKE_BINARY_DIR}/src/ui
   ${CMAKE_BINARY_DIR}/src/native
-)
-INCLUDE_DIRECTORIES(SYSTEM
-  ${QCA_INCLUDE_DIR}
-  ${QTKEYCHAIN_INCLUDE_DIR}
-  ${QWT_INCLUDE_DIR}
-  ${SQLITE3_INCLUDE_DIR}
-  ${QSCINTILLA_INCLUDE_DIR}
-  ${GDAL_INCLUDE_DIR}
-  ${PROJ_INCLUDE_DIR}
 )
 
 # disable deprecation warnings for classes re-exporting deprecated methods
@@ -1067,10 +1055,11 @@ ADD_DEPENDENCIES(qgis_gui ui)
 TARGET_LINK_LIBRARIES(qgis_gui
   qgis_core
   qgis_native
-  ${Qt5UiTools_LIBRARIES}
-  ${QWT_LIBRARY}
-  ${QSCINTILLA_LIBRARY}
-  ${Qt5QuickWidgets_LIBRARIES}
+  Qt5::UiTools
+  qwt::qwt
+  qscintilla::qscintilla
+  Qt5::Qml
+  Qt5::QuickWidgets
 )
 
 IF(ENABLE_MODELTEST)

@@ -28,6 +28,7 @@
 #include "qgsexpressioncontextutils.h"
 
 #include <QPainter>
+#include <QPainterPath>
 #include <QDomDocument>
 #include <QDomElement>
 

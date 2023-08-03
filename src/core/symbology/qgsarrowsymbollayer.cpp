@@ -16,6 +16,8 @@
 #include "qgsarrowsymbollayer.h"
 #include "qgssymbollayerutils.h"
 
+#include <QPainterPath>
+
 QgsArrowSymbolLayer::QgsArrowSymbolLayer()
 {
   /* default values */

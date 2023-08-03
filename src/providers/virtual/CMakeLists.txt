@@ -52,19 +52,6 @@ INCLUDE_DIRECTORIES(
   ${CMAKE_CURRENT_BINARY_DIR} # ui_xxx_dlg.h
 )
 
-INCLUDE_DIRECTORIES(SYSTEM
-  ${POSTGRES_INCLUDE_DIR}
-  ${SQLITE3_INCLUDE_DIR}
-  ${SPATIALITE_INCLUDE_DIR}
-  ${QCA_INCLUDE_DIR}
-)
-
-IF (WITH_GUI)
-  INCLUDE_DIRECTORIES(SYSTEM
-    ${QSCINTILLA_INCLUDE_DIR}
-  )
-ENDIF ()
-
 ADD_LIBRARY(virtuallayerprovider MODULE
   ${QGIS_VLAYER_PROVIDER_SRCS}
   ${vlayer_provider_MOC_SRCS}
@@ -74,11 +61,11 @@ ADD_LIBRARY(virtuallayerprovider MODULE
 
 TARGET_LINK_LIBRARIES( virtuallayerprovider
   qgis_core
-  ${Qt5Core_LIBRARIES}
-  ${Qt5Gui_LIBRARIES}
-  ${Qt5Widgets_LIBRARIES}
-  ${SQLITE3_LIBRARY}
-  ${SPATIALITE_LIBRARY}
+  Qt5::Core
+  Qt5::Gui
+  Qt5::Widgets
+  SQLite::SQLite3
+  libspatialite::libspatialite
 )
 
 IF (WITH_GUI)

@@ -35,19 +35,6 @@ INCLUDE_DIRECTORIES(
 
 )
 
-INCLUDE_DIRECTORIES(SYSTEM
-    ${LIBZIP_INCLUDE_DIRS}
-    ${SPATIALINDEX_INCLUDE_DIR}
-    ${PROJ_INCLUDE_DIR}
-    ${GEOS_INCLUDE_DIR}
-    ${GDAL_INCLUDE_DIR}
-    ${EXPAT_INCLUDE_DIR}
-    ${SQLITE3_INCLUDE_DIR}
-    ${SPATIALITE_INCLUDE_DIR}
-    ${QCA_INCLUDE_DIR}
-    ${QTKEYCHAIN_INCLUDE_DIR}
-)
-
 #note for tests we should not include the moc of our
 #qtests in the executable file list as the moc is
 #directly included in the sources
@@ -63,14 +50,6 @@ MACRO (ADD_QGIS_TEST testname testsrc)
   ADD_EXECUTABLE(qgis_${testname} ${qgis_${testname}_SRCS})
   SET_TARGET_PROPERTIES(qgis_${testname} PROPERTIES AUTOMOC TRUE)
   TARGET_LINK_LIBRARIES(qgis_${testname}
-    ${Qt5Xml_LIBRARIES}
-    ${Qt5Core_LIBRARIES}
-    ${Qt5Svg_LIBRARIES}
-    ${Qt5Test_LIBRARIES}
-    Qt5::Gui
-    Qt5::Qml
-    Qt5::Quick
-    Qt5::Xml
     qgis_core
     qgis_quick)
 

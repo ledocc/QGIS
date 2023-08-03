@@ -170,14 +170,6 @@ INCLUDE_DIRECTORIES(
   ${CMAKE_BINARY_DIR}/src/app
   ${CMAKE_CURRENT_BINARY_DIR}
 )
-INCLUDE_DIRECTORIES(SYSTEM
-  ${GDAL_INCLUDE_DIR}
-  ${PROJ_INCLUDE_DIR}
-  ${GEOS_INCLUDE_DIR}
-  ${POSTGRES_INCLUDE_DIR}
-  qtermwidget
-)
-
 
 MACRO(ADD_GRASSPLUGIN GRASS_BUILD_VERSION)
     SET(GRASS_PREFIX ${GRASS_PREFIX${GRASS_BUILD_VERSION}})
@@ -230,9 +222,9 @@ MACRO(ADD_GRASSPLUGIN GRASS_BUILD_VERSION)
     )
 
     TARGET_LINK_LIBRARIES (qgis.g.browser${GRASS_BUILD_VERSION}
-      ${Qt5Gui_LIBRARIES}
-      ${Qt5Widgets_LIBRARIES}
-      ${Qt5Core_LIBRARIES}
+      Qt5::Gui
+      Qt5::Widgets
+      Qt5::Core
     )
 
     ########################################################
